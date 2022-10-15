@@ -1,6 +1,5 @@
-require("dotenv").config()
 const express = require("express")
-const port = process.env.PORT || 5500
+const port = 5500
 const cors = require("cors")
 const mongoose = require("mongoose")
 const bodyParser = require("body-parser")
@@ -10,7 +9,7 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json());
 
-const uri = process.env.ATLAS_URI
+const uri = "mongodb+srv://dbUser:dbUserPassword@main.w010a.mongodb.net/?retryWrites=true&w=majority"
 mongoose.connect(uri, {})
 const connection = mongoose.connection
 connection.once('open', () => {
