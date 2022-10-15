@@ -3,6 +3,7 @@ import './App.css';
 import Movie from './components/Movie';
 import { useEffect, useState } from 'react';
 import UploadImage from './components/UploadImage';
+import axios from "axios"
 
 function App() {
 
@@ -14,49 +15,42 @@ function App() {
     let [file, setFile] = useState(null)
 
     useEffect(() => {
-        //insert code that gets all the data from the movies
-
-        setMovies([
-            {
-                posterUrl: "https://www.washingtonpost.com/graphics/2019/entertainment/oscar-nominees-movie-poster-design/img/black-panther-web.jpg",
-                movieName: "Black Panther",
-                rating: 2
-            },
-            {
-                posterUrl: "https://www.washingtonpost.com/graphics/2019/entertainment/oscar-nominees-movie-poster-design/img/black-panther-web.jpg",
-                movieName: "Black Panther",
-                rating: 3
-            },
-            {
-                posterUrl: "https://www.washingtonpost.com/graphics/2019/entertainment/oscar-nominees-movie-poster-design/img/black-panther-web.jpg",
-                movieName: "Black Panther",
-                rating: 5
-            },
-            {
-                posterUrl: "https://www.washingtonpost.com/graphics/2019/entertainment/oscar-nominees-movie-poster-design/img/black-panther-web.jpg",
-                movieName: "Black Panther",
-                rating: 5
-            },
-            {
-                posterUrl: "https://www.washingtonpost.com/graphics/2019/entertainment/oscar-nominees-movie-poster-design/img/black-panther-web.jpg",
-                movieName: "Black Panther",
-                rating: 5
-            }
-        ]) // comment out this line and call setMovies() with data from database as the values
+        axios.get("http://localhost:5500/movies")
+        .then(res => {
+            let tempMoviesArr = res.data
+            setMovies(tempMoviesArr)
+        })
     }, [])
 
-    const addMovie = () => {
+    async function getMovies(){
+        let tempMoviesArr = (await axios.get("http://localhost:5500/movies")).data
+        console.log(tempMoviesArr)
+        setMovies(tempMoviesArr)
+    }
+
+    const addMovie = async (e) => {
+
+        e.preventDefault()
         //insert code to add movie to database
-        if(modalMovieRating <= 5){
-            let tempMoviesArr = movies
-            tempMoviesArr.push(
-                {
-                    posterUrl: file,
-                    movieName: modalMovieName,
-                    rating: modalMovieRating
-                }
-            )
+        if(parseInt(modalMovieRating) <= 5){
+
+            const formData = new FormData()
+            formData.append('file', file)
+            formData.append('upload_preset', 'mongodb-demo')
+
+            const data = (await axios.post("https://api.cloudinary.com/v1_1/dvrjxs1zg/image/upload", formData)).data
+
+            let movie = {
+                url: data.secure_url,
+                name: modalMovieName,
+                rating: parseInt(modalMovieRating)
+            }
+            console.log(movie)
+            await axios.post("http://localhost:5500/movies/add", movie)
+                .then(res => {console.log(res.data)})
+
             setShowModal(false)
+            getMovies()
         }
     }
 
@@ -72,11 +66,11 @@ function App() {
                     <p>Add Movie</p>
                 </div>
             </div>
-            <div className='grid grid-cols-4 px-20 gap-8 pt-6 bg-slate-900 pb-8'>
+            <div className='min-h-screen grid grid-cols-4 px-20 gap-8 pt-6 bg-slate-900 pb-8'>
                 {
                     movies.map((movie, index) => {
                         return (
-                            <Movie posterUrl={movie.posterUrl} movieName={movie.movieName} rating={movie.rating} />
+                            <Movie url={movie.url} name={movie.name} rating={movie.rating} />
                         )
                     })
                 }

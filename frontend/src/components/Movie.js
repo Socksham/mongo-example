@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { FaStar } from "react-icons/fa";
 
 
-const Movie = ({ posterUrl, movieName, rating }) => {
+const Movie = ({ url, name, rating }) => {
 
     let [ratingArr, setRatingArr] = useState([])
 
@@ -23,10 +23,10 @@ const Movie = ({ posterUrl, movieName, rating }) => {
     return (
         <div>
             <div className='relative h-0 pb-3/2'>
-                <img className='absolute inset-0 w-full h-full' src={posterUrl} />
+                <img className='absolute inset-0 w-full h-full' src={url} />
             </div>
             <div className='bg-slate-700 pb-4 pt-2 px-4 rounded-b'>
-                <p className='text-xl font-semibold text-gray-200 mb-1'>{movieName}</p>
+                <p className='text-xl font-semibold text-gray-200 mb-1'>{name}</p>
                 <div className='flex mb-4'>
                     {
                         ratingArr.map((star, index) => {
